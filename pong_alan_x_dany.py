@@ -2,17 +2,23 @@ import pygame
 
 pygame.init()
 
+#preload
 right_click_png = pygame.image.load("mouse_click-gauche.png")
 racket_png = pygame.image.load("racket.png")
 ball_png = pygame.image.load("ball.png")
+background = pygame.image.load("background.png")
 
-screen_width = 600
-screen_height = 500
+#screen size
+screen_width = 800
+screen_height = 560
+background = pygame.transform.scale(background, (screen_width, screen_height))
+
+
 
 
 fpsClock = pygame.time.Clock()
 screen = pygame.display.set_mode((screen_width, screen_height))
-pygame.display.set_caption("Pong")
+pygame.display.set_caption("Pong by Alan and Dany")
 
 
 #font
@@ -24,11 +30,16 @@ font = pygame.font.SysFont(None, 30)
 
 #game variable
 live_ball = False
-margin = 60
+margin = 70
 comp_score = 0
 player_score = 0
 fps = 60
 winner = 0
+speed_max = 28
+game_finished = False
+angle = 0
+
+#printing varaibles
 echanges = 0
 speed_ball = 0
 
@@ -39,10 +50,11 @@ white = (165, 165, 165)
 
 def draw_board():
     screen.fill(blue_dark)
+#    screen.blit(background, (0, 0))
     pygame.draw.line(screen, white, (0, margin), (screen_width, margin))
-    pygame.draw.line(screen, white, (screen_width/2, margin), (screen_width/2, screen_height))
-    pygame.draw.line(screen, white, (screen_width/4, 0), (screen_width/4, margin))
-    pygame.draw.line(screen, white, ((screen_width/4) * 3, 0), ((screen_width/4) * 3, margin))
+#    pygame.draw.line(screen, white, (screen_width/2, margin), (screen_width/2, screen_height))
+    pygame.draw.line(screen, white, ((screen_width/3) * 1, 0), (screen_width/4, margin))
+    pygame.draw.line(screen, white, ((screen_width/3) * 2, 0), ((screen_width/4) * 3, margin))
 
 
 
@@ -79,8 +91,8 @@ class racket():
     def __init__(self, x, y):
         self.x = x
         self.y = y
-#        self.rect = rect(self.x, self.y, 20, 100)
-        self.speed = 3.6
+#        self.rect = pygame.rect(self.x, self.y, 20, 100)
+        self.speed = 8
 
     def move(self):
         key = pygame.key.get_pressed()
@@ -110,7 +122,6 @@ class racket():
 
 
 
-
 class ball():
     def __init__(self, x, y):
         self.reset(x, y)
@@ -122,30 +133,118 @@ class ball():
         if self.y < margin:
             self.speed_y *= -1
         #bottom screen 
-        if self.y > screen_height:
+        if self.y + 16 > screen_height:
             self.speed_y *= -1
 
 
         #collision with racket
 #        if self.rect.colliderect(player_racket) or self.rect.colliderect(comp_racket):
 #            self.speed_x *= -1
-        if self.x + 16 > player_racket.x and self.y > player_racket.y + 8 and self.y < player_racket.y + 100:
+        if self.x + 16 > player_racket.x and self.y +16 > player_racket.y and self.y < player_racket.y + 100:
             self.speed_x *= -1
+            #moitié haute
+            if self.y + 8 < player_racket.y + 20:
+                if self.speed_y > 0:
+                    self.speed_y *= -1.25
+                else:
+                    self.speed_y *= 1.25
+
+            #mid haut
+            if self.y + 8 < player_racket.y + 20 and self.y + 8 < player_racket.y + 40:
+                if self.speed_y > 0:
+                    self.speed_y *= -1
+                else:
+                    self.speed_y *= 1
+
+            #middle
+            if self.y + 0 > player_racket.y + 40 and self.y + 0 > player_racket.y + 60:
+                if self.speed_y > 0:
+                    self.speed_y *= 0.5
+                else:
+                    self.speed_y *= -0.5
+
+            #mid bas
+            if self.y + 0 > player_racket.y + 60 and self.y + 0 > player_racket.y + 80:
+                if self.speed_y > 0:
+                    self.speed_y *= 1
+                else:
+                    self.speed_y *= -1
+            
+
+            #moitié basse
+            if self.y + 0 > player_racket.y + 80:
+                if self.speed_y > 0:
+                    self.speed_y *= 1.25
+                else:
+                    self.speed_y *= -1.25
+                
             global echanges
             echanges += 1
-        if self.x < comp_racket.x + 20 and self.y > comp_racket.y + 8 and self.y < comp_racket.y + 100:
+            if self.speed_x > -speed_max:
+                self.speed_x += -1
+                if self.speed_y > 0:
+                    self.speed_y += 1
+                else:
+                    self.speed_y += -1
+
+        if self.x < comp_racket.x + 20  and self.y + 16 > comp_racket.y and self.y < comp_racket.y + 100:
             self.speed_x *= -1
+            #moitié haute
+            if self.y + 8 < player_racket.y + 20:
+                if self.speed_y > 0:
+                    self.speed_y *= -1.25
+                else:
+                    self.speed_y *= 1.25
+
+            #mid haut
+            if self.y + 8 > player_racket.y + 20 and self.y + 8 > player_racket.y + 40:
+                if self.speed_y > 0:
+                    self.speed_y *= -1
+                else:
+                    self.speed_y *= 1
+
+            #middle
+            if self.y + 8 > player_racket.y + 40 and self.y + 8 > player_racket.y + 60:
+                if self.speed_y > 0:
+                    self.speed_y *= 0.5
+                else:
+                    self.speed_y *= -0.5
+
+            #mid bas
+            if self.y + 8 > player_racket.y + 60 and self.y + 8 > player_racket.y + 80:
+                if self.speed_y > 0:
+                    self.speed_y *= 1
+                else:
+                    self.speed_y *= -1
+
+            #moitié basse
+            if self.y + 8 > player_racket.y + 80:
+                if self.speed_y > 0:
+                    self.speed_y *= 1.25
+                else:
+                    self.speed_y *= -1.25
+
+            
+
             echanges += 1
+            if self.speed_x < speed_max:
+                self.speed_x += 1
+                if self.speed_y > 0:
+                    self.speed_y += 1
+                else:
+                    self.speed_y += -1
         
         #check if reach under a racket
-        if self.x < 20:
+        if self.x < 0:
             self.winner = 1
-        if self.x > screen_width -20:
+        if self.x > screen_width:
             self.winner = -1
 
         #update ball position
         self.x += self.speed_x
         self.y += self.speed_y
+
+
 
         global speed_ball
         if self.speed_x > 0:
@@ -218,10 +317,12 @@ while run:
 
 
     draw_board()
-    draw_text("Comp: " + str(comp_score), font, white, 20, 15)
-    draw_text("Player: " + str(player_score), font, white, screen_width - 120, 15)
-    draw_text("Nb Echange: " + str(echanges), font, white, screen_width // 2 - 70, 10)
-    draw_text("Speed: " + str(speed_ball), font, white, screen_width // 2 - 50, 30)
+    draw_text("Ordi : " + str(comp_score), font, white, 25, 25)
+    draw_text("Joueur: " + str(player_score), font, white, screen_width - 115, 25)
+    if game_finished == False:
+        draw_text("Échanges: " + str(echanges), font, white, screen_width // 2 - 65, 10)
+        draw_text("Vitesse: " + str(speed_ball), font, white, screen_width // 2 - 50, 40)
+
 
     #draw racket
     player_racket.draw()
@@ -247,10 +348,26 @@ while run:
     if live_ball == False:
         screen.blit(right_click_png, (screen_width / 2 - 45, screen_height / 2 - 50))
 
+
+    #affichage victoire/défaite
+    if player_score == 10:
+        game_finished = True
+        live_ball = False
+        draw_text("Victoire !", pygame.font.SysFont(None, 50), white, screen_width // 2 - 80, screen_height // 4)
+    if comp_score == 10:
+        game_finished = True
+        live_ball = False
+        draw_text("Défaite !", pygame.font.SysFont(None, 50), white, screen_width // 2 - 70, screen_height // 4)
+
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
         if event.type == pygame.MOUSEBUTTONDOWN and live_ball == False :
+            if game_finished == True:
+                player_score = 0
+                comp_score = 0
+                game_finished = False
             echanges = 0
             live_ball = True
             pong_ball.reset(screen_width - 70, screen_height // 2 + 70)

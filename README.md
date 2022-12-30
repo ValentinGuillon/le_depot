@@ -1,4 +1,7 @@
-# RTS Sci-Fi
-Projet Godot jusqu'à la séance 5 (inclu) (sans les exos bonus)<br>
-Programme en anglais (variables et fonctions)<br>
-Mais commenté en français<br>
+# Colt Zeʁma
+Projet python, version simplifiée du jeu "Colt Express"<br>
+Programme en anglais et français (dsl mdr)<br>
+Mais commenté en français (et anglais aussi (dsl mdr))<br>
+
+Pour lancer le jeu, rien de plus simple, extraire tous les fichiers, et lancer la commande "python3 colt-ze3ma.py"<br>
+!!! il faut impérativement être au même emplacement  que le fichier pour lancer la commande<br>
